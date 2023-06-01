@@ -2,7 +2,12 @@
 function calcular($operacion){
     $operacion = str_replace(' ','',$operacion);
     $coincidencias = preg_split('/([+\-*\/])/', $operacion, -1, PREG_SPLIT_DELIM_CAPTURE);
-    return $coincidencias;
+    
+    $numeros = array_map(function($val){
+        return is_numeric($val) ? floatval($val) : $val;
+    }, array_slice($coincidencias, 0));
+
+    return $numeros;
 }
 
 session_start();
@@ -13,8 +18,8 @@ if (isset($_POST['numero'])) {
     } elseif ($_POST['numero'] == "←") {
         $_SESSION['num1'] = substr($_SESSION['num1'], 0, strlen($_SESSION['num1']) - 1);
     } elseif ($_POST['numero'] == "=") {
-        $_SESSION['num1'] = calcular($_SESSION['num1']);
-        var_dump($_SESSION['num1']);
+        // $_SESSION['num1'] = );
+        var_dump(calcular($_SESSION['num1']));
     } else {
         if (isset($_SESSION['num1'])) {
             $_SESSION['num1'] .= $_POST['numero'];
