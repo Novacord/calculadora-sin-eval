@@ -1,19 +1,28 @@
 <?php
-    session_start();
-    if (isset($_POST['numero'])) {
-        if($_POST['numero'] == "c"){
-            $_SESSION['num1'] = null;
-        }else if($_POST['numero'] == "←"){
-            // $_SESSION['num1'] = substr($_SESSION['num1'],0, -1);
-            $_SESSION['num1'] = substr($_SESSION['num1'], 0, strlen($_SESSION['num1']) - 1);
-        }else{
-            if (isset($_SESSION['num1'])) {
-                $_SESSION['num1'] .= $_POST['numero'];
-            } else {
-                $_SESSION['num1'] =  $_POST['numero'];
-            }
+function calcular($operacion){
+    $operacion = str_replace(' ','',$operacion);
+    $coincidencias = preg_split('/([+\-*\/])/', $operacion, -1, PREG_SPLIT_DELIM_CAPTURE);
+    return $coincidencias;
+}
+
+session_start();
+
+if (isset($_POST['numero'])) {
+    if ($_POST['numero'] == "c") {
+        $_SESSION['num1'] = null;
+    } elseif ($_POST['numero'] == "←") {
+        $_SESSION['num1'] = substr($_SESSION['num1'], 0, strlen($_SESSION['num1']) - 1);
+    } elseif ($_POST['numero'] == "=") {
+        $_SESSION['num1'] = calcular($_SESSION['num1']);
+        var_dump($_SESSION['num1']);
+    } else {
+        if (isset($_SESSION['num1'])) {
+            $_SESSION['num1'] .= $_POST['numero'];
+        } else {
+            $_SESSION['num1'] = $_POST['numero'];
         }
     }
+}
 ?>
 
 <!DOCTYPE html>
