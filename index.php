@@ -7,7 +7,15 @@ function calcular($operacion){
         return is_numeric($val) ? floatval($val) : $val;
     }, array_slice($coincidencias, 0));
 
-    return $numeros;
+    foreach($numeros as $key => $valor){
+        if($valor == '*'){
+            $numero1 = $numeros[key-1];
+            $numero2 = $numeros[key+2];
+            $resultado = $numero1 * $numero2;
+        }
+    }
+
+    return $resultado;
 }
 
 session_start();
