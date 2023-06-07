@@ -1,17 +1,36 @@
 <?php
 function calcular($operacion){
     $operacion = str_replace(' ','',$operacion);
-    $coincidencias = preg_split('/([+\-*\/])/', $operacion, -1, PREG_SPLIT_DELIM_CAPTURE);
-    
-    $numeros = array_map(function($val){
-        return is_numeric($val) ? floatval($val) : $val;
-    }, array_slice($coincidencias, 0));
+    while (preg_match('/(-?\d+(\.\d+)?)([\/\*])(-?\d+(\.\d+)?)/', $operacion, $coincidencia)) {
+        $resultado = 0;
+        $numero1 = floatval($coincidencia[1]);
+        $numero2 = floatval($coincidencia[4]);
 
-    foreach($numeros as $key => $valor){
-        if($valor == '*'){
-            $numero1 = $numeros[key-1];
-            $numero2 = $numeros[key+2];
+        if ($coincidencia[3] === '*') {
             $resultado = $numero1 * $numero2;
+        } elseif ($coincidencia[3] === '/') {
+            $resultado = $numero1 / $numero2;
+        }
+
+        // var_dump($coincidencia[0]);
+        // var_dump($resultado);
+        // var_dump($operacion);
+
+        $operacion = str_replace($coincidencia[0], $resultado, $operacion);
+    }
+
+    $numeros = preg_split('/([+\-])/', $operacion, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+    $resultado = 0;
+    $operador = '+';
+    foreach ($numeros as $numero) {
+        if (is_numeric($numero)) {
+            if ($operador === '+') {
+                $resultado += $numero;
+            } elseif ($operador === '-') {
+                $resultado -= $numero;
+            }
+        } else {
+            $operador = $numero;
         }
     }
 
@@ -26,8 +45,9 @@ if (isset($_POST['numero'])) {
     } elseif ($_POST['numero'] == "←") {
         $_SESSION['num1'] = substr($_SESSION['num1'], 0, strlen($_SESSION['num1']) - 1);
     } elseif ($_POST['numero'] == "=") {
-        // $_SESSION['num1'] = );
-        var_dump(calcular($_SESSION['num1']));
+        $resultado = calcular($_SESSION['num1']);
+        $_SESSION['num1'] = $resultado;
+        $_POST['numero'] = $resultado;
     } else {
         if (isset($_SESSION['num1'])) {
             $_SESSION['num1'] .= $_POST['numero'];
@@ -147,6 +167,7 @@ background-color: rgb(15, 90, 112);
         <input type="submit" name="numero" value="c">
         <input type="submit" name="numero" value="/">
         <input type="submit" name="numero" value="=">
+        <input type="submit" name="numero" value=".">
         <input type="submit" name="numero" value="←">
     </form>
 </body>
